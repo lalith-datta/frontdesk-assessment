@@ -1,0 +1,9 @@
+livekit-agents[silero]~=1.2
+livekit-plugins-noise-cancellation~=0.2
+python-dotenv
+torch
+fastapi
+uvicorn
+firebase-admin
+jinja2
+httpx

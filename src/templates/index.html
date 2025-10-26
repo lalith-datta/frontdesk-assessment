@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Assistant Supervisor</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        h1, h2 { color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .pending-questions, .history { margin-bottom: 2em; }
+        .question { border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 5px; }
+        .question p { margin: 0 0 1em 0; }
+        .question form { display: flex; }
+        .question input { flex-grow: 1; padding: 0.5em; }
+        .question button { padding: 0.5em 1em; margin-left: 1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Salon Assistant Supervisor</h1>
+        
+        <div class="pending-questions">
+            <h2>Pending Questions</h2>
+            <div id="pending-list">
+                <!-- Pending questions will be loaded here -->
+            </div>
+        </div>
+
+        <div class="history">
+            <h2>History</h2>
+            <div id="history-list">
+                <!-- History of questions will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchQuestions() {
+            const pendingList = document.getElementById('pending-list');
+            const historyList = document.getElementById('history-list');
+
+            pendingList.innerHTML = '';
+            historyList.innerHTML = '';
+
+            try {
+                const response = await fetch('/questions?status=all');
+                const data = await response.json();
+
+                data.questions.forEach(q => {
+                    const questionElement = document.createElement('div');
+                    questionElement.classList.add('question');
+
+                    if (q.status === 'pending') {
+                        questionElement.innerHTML = `
+                            <p><strong>Question:</strong> ${q.question_text}</p>
+                            <form onsubmit="submitAnswer(event, '${q.id}')">
+                                <input type="text" name="answer_text" placeholder="Your answer..." required>
+                                <button type="submit">Submit Answer</button>
+                            </form>
+                        `;
+                        pendingList.appendChild(questionElement);
+                    } else {
+                        questionElement.innerHTML = `
+                            <p><strong>Question:</strong> ${q.question_text}</p>
+                            <p><strong>Answer:</strong> ${q.answer_text}</p>
+                            <p><em>Status: ${q.status}</em></p>
+                        `;
+                        historyList.appendChild(questionElement);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching questions:', error);
+                pendingList.innerHTML = '<p>Error loading questions.</p>';
+                historyList.innerHTML = '<p>Error loading history.</p>';
+            }
+        }
+
+        async function submitAnswer(event, questionId) {
+            event.preventDefault();
+            const form = event.target;
+            const answerText = form.elements.answer_text.value;
+
+            try {
+                const response = await fetch(`/questions/${questionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ answer_text: answerText }),
+                });
+
+                if (response.ok) {
+                    fetchQuestions(); // Refresh the lists
+                } else {
+                    console.error('Error submitting answer:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+            }
+        }
+
+        // Fetch questions on page load
+        fetchQuestions();
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: agent-starter-python
+Version: 1.0.0
+Summary: Simple voice AI assistant built with LiveKit Agents for Python
+Requires-Python: >=3.9
+License-File: LICENSE
+Requires-Dist: livekit-agents[silero]~=1.2
+Requires-Dist: livekit-plugins-noise-cancellation~=0.2
+Requires-Dist: python-dotenv
+Requires-Dist: torch
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: firebase-admin
+Requires-Dist: jinja2
+Requires-Dist: httpx
+Dynamic: license-file
